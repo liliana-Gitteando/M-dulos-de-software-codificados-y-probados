@@ -21,16 +21,16 @@ public class Main {
 
         Documento doc = new Documento();
         
-        doc.setTipoDocumento("E"); 
-        doc.setAsunto("Prueba Hibernate 2");
-        doc.setRemitente("Empresa A");
-        doc.setDestinatario("Empresa B");
+        doc.setTipoDocumento("I"); 
+        doc.setAsunto("Prueba Hibernate 27");
+        doc.setRemitente("Recursos Humanos");
+        doc.setDestinatario("Recursos Fisicos");
         doc.setFechaRadicacion(new Date());
         doc.setFechaVencimiento(new Date());
-        doc.setEstado("Devuelto");
+        doc.setEstado("recibido");
         doc.setUsuarioId(1);
-        doc.setDependencia("Contabilidad");
-        doc.setObservaciones("Corrección de nómina");
+        doc.setDependencia("Recursos Humanos");
+        doc.setObservaciones("Reunión para acuerdos de infraestructura y remodelación");
         doc.setFechaCreacion(new Date());
 
         dao.guardar(doc);

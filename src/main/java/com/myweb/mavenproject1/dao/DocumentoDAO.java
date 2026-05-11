@@ -37,8 +37,10 @@ public class DocumentoDAO {
                 throw new Exception("El destinatario es obligatorio");
             }
 
-            // ===== 🔥 CORRECCIÓN AQUÍ (RADICADO POR TIPO Y AÑO) =====
-            String tipo = documento.getTipoDocumento(); // I, S, E
+            /**
+            * RADICADO POR TIPO Y AÑO
+            */
+                String tipo = documento.getTipoDocumento(); // I, S, E
             int anio = java.time.LocalDate.now().getYear();
 
             int consecutivo = obtenerSiguienteRadicado(tipo, anio);
@@ -48,7 +50,7 @@ public class DocumentoDAO {
             documento.setNumeroRadicado(radicado);
 
             System.out.println("Radicado generado: " + radicado);
-            // ===== FIN CORRECCIÓN =====
+            
 
             session.save(documento);
             tx.commit();
