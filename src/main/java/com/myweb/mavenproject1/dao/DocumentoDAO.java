@@ -43,9 +43,15 @@ public class DocumentoDAO {
                 String tipo = documento.getTipoDocumento(); // I, S, E
             int anio = java.time.LocalDate.now().getYear();
 
-            int consecutivo = obtenerSiguienteRadicado(tipo, anio);
+            int mes = java.time.LocalDate.now().getMonthValue();
 
-            String radicado = "RAD-" + tipo + "-" + anio + "-" + String.format("%05d", consecutivo);
+            int consecutivo =
+                    obtenerSiguienteRadicado(tipo, anio, mes);
+
+             String radicado =
+                "RAD-" + tipo + "-" + anio + "-"
+                + String.format("%02d", mes) + "-"
+                + String.format("%05d", consecutivo);
 
             documento.setNumeroRadicado(radicado);
 
@@ -64,6 +70,7 @@ public class DocumentoDAO {
             session.close();
         }
     }
+    
 
     /**
      * Listar 
@@ -106,41 +113,61 @@ public class DocumentoDAO {
         }
     }
 
-    /**
-     * Obtener consecutivo por tipo y año
-     */
-    public int obtenerSiguienteRadicado(String tipo, int anio) {
+/**
+ * Obtener consecutivo por tipo, año y mes
+ */
+public int obtenerSiguienteRadicado(String tipo, int anio, int mes) {
 
-        Session session = HibernateUtil.getSessionFactory().openSession();
+    Session session = HibernateUtil.getSessionFactory().openSession();
+
+    try {
+
+        String patron =
+                "RAD-" + tipo + "-" + anio + "-"
+                + String.format("%02d", mes) + "-%";
 
         Query<String> q = session.createQuery(
-            "SELECT numeroRadicado FROM Documento " +
-            "WHERE numeroRadicado LIKE :patron " +
-            "ORDER BY numeroRadicado DESC",
+            "SELECT d.numeroRadicado "
+            + "FROM Documento d "
+            + "WHERE d.numeroRadicado LIKE :patron",
             String.class
         );
 
-        String patron = "RAD-" + tipo + "-" + anio + "-%";
         q.setParameter("patron", patron);
-        q.setMaxResults(1);
 
-        String ultimo = q.uniqueResult();
+        List<String> resultados = q.list();
+
+        int maximo = 0;
+
+        for (String radicado : resultados) {
+
+            System.out.println("Radicado encontrado: " + radicado);
+
+            String numeroStr =
+                    radicado.substring(radicado.lastIndexOf("-") + 1);
+
+            int numero = Integer.parseInt(numeroStr);
+
+            if (numero > maximo) {
+                maximo = numero;
+            }
+        }
+
+        return maximo + 1;
+
+    } catch (Exception e) {
+
+        System.out.println("Error obteniendo consecutivo");
+
+        e.printStackTrace();
+
+        return 1;
+
+    } finally {
 
         session.close();
-
-        if (ultimo == null) {
-            return 1;
-        }
-
-        try {
-            String numeroStr = ultimo.substring(ultimo.length() - 5);
-            int numero = Integer.parseInt(numeroStr);
-            return numero + 1;
-        } catch (Exception e) {
-            return 1;
-        }
     }
-
+}
     /**
      * Validar si ya existe un radicado 
      */

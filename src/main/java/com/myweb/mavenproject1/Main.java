@@ -22,14 +22,14 @@ public class Main {
         Documento doc = new Documento();
         
         doc.setTipoDocumento("S"); 
-        doc.setAsunto("Respuesta a certificación laboral por el periodo del año 2000 al 2005");
+        doc.setAsunto("Invitación desayuno celebración día de las madres");
         doc.setRemitente("Generatión Z sistematization S.A.");
-        doc.setDestinatario("Alberto Castro");
+        doc.setDestinatario("Herramientas y productos Ltda.");
         doc.setFechaRadicacion(new Date());
         doc.setFechaVencimiento(new Date());
         doc.setEstado("enviado");
         doc.setUsuarioId(1);
-        doc.setDependencia("Recursos Humanos");
+        doc.setDependencia("Dirección general");
         doc.setObservaciones("");
         doc.setFechaCreacion(new Date());
 
