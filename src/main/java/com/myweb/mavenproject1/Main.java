@@ -21,16 +21,16 @@ public class Main {
 
         Documento doc = new Documento();
         
-        doc.setTipoDocumento("I"); 
-        doc.setAsunto("Prueba Hibernate 27");
-        doc.setRemitente("Recursos Humanos");
-        doc.setDestinatario("Recursos Fisicos");
+        doc.setTipoDocumento("S"); 
+        doc.setAsunto("Respuesta a certificación laboral por el periodo del año 2000 al 2005");
+        doc.setRemitente("Generatión Z sistematization S.A.");
+        doc.setDestinatario("Alberto Castro");
         doc.setFechaRadicacion(new Date());
         doc.setFechaVencimiento(new Date());
-        doc.setEstado("recibido");
+        doc.setEstado("enviado");
         doc.setUsuarioId(1);
         doc.setDependencia("Recursos Humanos");
-        doc.setObservaciones("Reunión para acuerdos de infraestructura y remodelación");
+        doc.setObservaciones("");
         doc.setFechaCreacion(new Date());
 
         dao.guardar(doc);
