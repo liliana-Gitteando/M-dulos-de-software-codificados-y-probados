@@ -2,115 +2,125 @@ package com.myweb.mavenproject1.dao;
 
 import com.myweb.mavenproject1.entidades.Reporte;
 import com.myweb.mavenproject1.util.HibernateUtil;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 
 import java.util.List;
 
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+
 public class ReporteDAO {
 
-    public void guardar(Reporte r) {
+
+    // GUARDAR REPORTE
+
+    public void guardar(Reporte reporte) {
+
+        // VALIDACIONES
+
+        if (reporte.getUsuarioId() == null) {
+            throw new RuntimeException("El usuario es obligatorio");
+        }
+
+        if (reporte.getTipoReporte() == null ||
+                reporte.getTipoReporte().trim().isEmpty()) {
+
+            throw new RuntimeException("El tipo de reporte es obligatorio");
+        }
+
+        if (reporte.getFormato() == null) {
+            throw new RuntimeException("El formato es obligatorio");
+        }
+
+        // VALIDAR FORMATOS
+
+        String formato = reporte.getFormato().toUpperCase();
+
+        if (!formato.equals("PDF") &&
+                !formato.equals("EXCEL") &&
+                !formato.equals("XLSX")) {
+
+            throw new RuntimeException(
+                    "Formato inválido. Solo PDF o EXCEL"
+            );
+        }
+
         Session session = null;
-        Transaction tx = null;
+
         try {
+
             session = HibernateUtil.getSessionFactory().openSession();
-            tx = session.beginTransaction();
-   
-            
+
+            Transaction tx = session.beginTransaction();
+
+            session.save(reporte);
+
             tx.commit();
-            System.out.println("Reporte guardado exitosamente");
-        } catch (Exception ex) {
-            if (tx != null) {
-                tx.rollback();
-            }
-            System.err.println("Error al guardar reporte: " + ex.getMessage());
-            ex.printStackTrace();
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+            throw new RuntimeException(
+                    "Error al guardar reporte"
+            );
+
         } finally {
+
             if (session != null) {
                 session.close();
             }
         }
     }
+
+    // LISTAR REPORTES
 
     public List<Reporte> listar() {
+
         Session session = null;
+
         try {
+
             session = HibernateUtil.getSessionFactory().openSession();
-            List<Reporte> lista = session.createQuery("FROM Reporte", Reporte.class).list();
-            return lista;
-        } catch (Exception ex) {
-            System.err.println("Error al listar reportes: " + ex.getMessage());
-            ex.printStackTrace();
+
+            return session.createQuery(
+                    "FROM Reporte ORDER BY id DESC",
+                    Reporte.class
+            ).list();
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
             return null;
+
         } finally {
+
             if (session != null) {
                 session.close();
             }
         }
     }
 
+    // OBTENER REPORTE POR ID
+    
     public Reporte obtenerPorId(int id) {
+
         Session session = null;
+
         try {
+
             session = HibernateUtil.getSessionFactory().openSession();
-            Reporte reporte = session.get(Reporte.class, id);
-            return reporte;
-        } catch (Exception ex) {
-            System.err.println("Error al obtener reporte: " + ex.getMessage());
-            ex.printStackTrace();
+
+            return session.get(Reporte.class, id);
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
             return null;
+
         } finally {
-            if (session != null) {
-                session.close();
-            }
-        }
-    }
 
-    public void actualizar(Reporte r) {
-        Session session = null;
-        Transaction tx = null;
-        try {
-            session = HibernateUtil.getSessionFactory().openSession();
-            tx = session.beginTransaction();
-            session.update(r);
-            tx.commit();
-            System.out.println("Reporte actualizado exitosamente");
-        } catch (Exception ex) {
-            if (tx != null) {
-                tx.rollback();
-            }
-            System.err.println("Error al actualizar reporte: " + ex.getMessage());
-            ex.printStackTrace();
-        } finally {
-            if (session != null) {
-                session.close();
-            }
-        }
-    }
-
-    public void eliminar(int id) {
-        Session session = null;
-        Transaction tx = null;
-        try {
-            session = HibernateUtil.getSessionFactory().openSession();
-            tx = session.beginTransaction();
-
-            Reporte r = session.get(Reporte.class, id);
-            if (r != null) {
-                session.delete(r);
-                System.out.println("Reporte eliminado exitosamente");
-            } else {
-                System.out.println("Reporte no encontrado");
-            }
-
-            tx.commit();
-        } catch (Exception ex) {
-            if (tx != null) {
-                tx.rollback();
-            }
-            System.err.println("Error al eliminar reporte: " + ex.getMessage());
-            ex.printStackTrace();
-        } finally {
             if (session != null) {
                 session.close();
             }

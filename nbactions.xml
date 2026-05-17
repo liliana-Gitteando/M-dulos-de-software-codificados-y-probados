@@ -8,6 +8,7 @@
             <goals>
                 <goal>process-classes</goal>
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
+                <goal>-DskipTests=true</goal>
             </goals>
             <properties>
                 <exec.args>-classpath %classpath com.myweb.mavenproject1.Main</exec.args>

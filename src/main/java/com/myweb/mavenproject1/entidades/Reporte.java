@@ -3,49 +3,57 @@ package com.myweb.mavenproject1.entidades;
 import java.util.Date;
 import javax.persistence.*;
 
-/**
- * Entidad que representa la tabla Login_usuarios
- */
 @Entity
 @Table(name = "reportes")
 public class Reporte {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
-    @Column(name = "usuario_id")
-    private int usuarioId;
+    @Column(name = "usuario_id", nullable = false)
+    private Integer usuarioId;
 
-    @Column(name = "tipo_reporte")
+    @Column(name = "tipo_reporte", nullable = false, length = 100)
     private String tipoReporte;
 
+    @Column(name = "descripcion", nullable = false, length = 300)
     private String descripcion;
 
-    @Column(name = "fecha_generacion")
     @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "fecha_generacion")
     private Date fechaGeneracion;
 
+    @Column(name = "formato", nullable = false, length = 10)
     private String formato;
 
-    @Column(name = "ruta_archivo")
+    @Column(name = "ruta_archivo", length = 300)
     private String rutaArchivo;
 
-    // Getters y Setters
+    @Temporal(TemporalType.DATE)
+    @Column(name = "fecha_inicio")
+    private Date fechaInicio;
+
+    @Temporal(TemporalType.DATE)
+    @Column(name = "fecha_fin")
+    private Date fechaFin;
+
+    // GETTERS Y SETTERS
     
-    public int getId() {
+
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    public int getUsuarioId() {
+    public Integer getUsuarioId() {
         return usuarioId;
     }
 
-    public void setUsuarioId(int usuarioId) {
+    public void setUsuarioId(Integer usuarioId) {
         this.usuarioId = usuarioId;
     }
 
@@ -87,5 +95,21 @@ public class Reporte {
 
     public void setRutaArchivo(String rutaArchivo) {
         this.rutaArchivo = rutaArchivo;
+    }
+
+    public Date getFechaInicio() {
+        return fechaInicio;
+    }
+
+    public void setFechaInicio(Date fechaInicio) {
+        this.fechaInicio = fechaInicio;
+    }
+
+    public Date getFechaFin() {
+        return fechaFin;
+    }
+
+    public void setFechaFin(Date fechaFin) {
+        this.fechaFin = fechaFin;
     }
 }
