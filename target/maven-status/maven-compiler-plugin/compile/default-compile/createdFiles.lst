@@ -4,6 +4,7 @@ com\myweb\mavenproject1\entidades\Documento.class
 com\myweb\mavenproject1\entidades\Reporte.class
 com\myweb\mavenproject1\entidades\Alertas.class
 com\myweb\mavenproject1\util\HibernateUtil.class
+com\myweb\mavenproject1\LoginRequest.class
 com\myweb\mavenproject1\Main.class
 com\myweb\mavenproject1\util\DiasHabilesUtil.class
 com\myweb\mavenproject1\dao\LoginUsuarioDAO.class

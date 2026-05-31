@@ -1,6 +1,7 @@
 package com.myweb.mavenproject1.dao;
 
 import com.myweb.mavenproject1.entidades.Alertas;
+import com.myweb.mavenproject1.entidades.LoginUsuario;
 import com.myweb.mavenproject1.util.HibernateUtil;
 
 import org.hibernate.Session;
@@ -13,48 +14,130 @@ import java.util.List;
 
 public class AlertasDAO {
 
-    public void guardar(Alertas alerta) throws Exception {
+     public void guardar(Alertas alerta) throws Exception {
 
         Session session = null;
         Transaction tx = null;
 
         try {
 
+            // =========================
+            // VALIDACIONES BASICAS
+            // =========================
+
             if (alerta == null) {
-                throw new RuntimeException("La alerta no puede ser null");
+                throw new RuntimeException(
+                        "La alerta no puede ser null"
+                );
             }
 
             if (alerta.getUsuarioId() == null) {
-                throw new RuntimeException("Usuario obligatorio");
+                throw new RuntimeException(
+                        "El usuario es obligatorio"
+                );
             }
 
-            if (alerta.getTipoAlerta() == null) {
-                throw new RuntimeException("Tipo alerta obligatorio");
+            if (alerta.getTipoAlerta() == null ||
+                alerta.getTipoAlerta().trim().isEmpty()) {
+
+                throw new RuntimeException(
+                        "El tipo de alerta es obligatorio"
+                );
             }
 
-            session = HibernateUtil.getSessionFactory().openSession();
+            // =========================
+            // ABRIR SESION
+            // =========================
+
+            session = HibernateUtil
+                    .getSessionFactory()
+                    .openSession();
 
             tx = session.beginTransaction();
 
-            if (alerta == null) {
-                throw new RuntimeException("La alerta no puede ser null");
+            // =========================
+            // VALIDAR USUARIO EXISTENTE
+            // =========================
+
+            LoginUsuario usuario = session.get(
+                    LoginUsuario.class,
+                    alerta.getUsuarioId()
+            );
+
+            if (usuario == null) {
+
+                throw new RuntimeException(
+                        "El usuario no existe en la base de datos"
+                );
             }
 
-            if (alerta.getUsuarioId() == null) {
-                throw new RuntimeException("Usuario obligatorio");
+            // =========================
+            // VALIDAR ALERTA DUPLICADA
+            // =========================
+
+            Query<Long> query = session.createQuery(
+                    "SELECT COUNT(a) " +
+                    "FROM Alertas a " +
+                    "WHERE a.usuarioId = :usuarioId " +
+                    "AND a.tipoAlerta = :tipoAlerta " +
+                    "AND a.estado = :estado",
+                    Long.class
+            );
+
+            query.setParameter(
+                    "usuarioId",
+                    alerta.getUsuarioId()
+            );
+
+            query.setParameter(
+                    "tipoAlerta",
+                    alerta.getTipoAlerta()
+            );
+
+            query.setParameter(
+                    "estado",
+                    alerta.getEstado()
+            );
+
+            Long total = query.getSingleResult();
+
+            if (total > 0) {
+
+                throw new RuntimeException(
+                        "Ya existe una alerta igual para este usuario"
+                );
             }
+
+            // =========================
+            // FECHA AUTOMATICA
+            // =========================
+
+            if (alerta.getFechaCreacion() == null) {
+                alerta.setFechaCreacion(new Date());
+            }
+
+            // =========================
+            // GUARDAR ALERTA
+            // =========================
 
             session.persist(alerta);
 
             tx.commit();
 
-            System.out.println("✓ Alerta guardada");
+            System.out.println(
+                    "Alerta guardada correctamente"
+            );
 
         } catch (Exception ex) {
 
             if (tx != null) {
                 tx.rollback();
             }
+
+            System.out.println(
+                    "Error al guardar alerta: "
+                    + ex.getMessage()
+            );
 
             ex.printStackTrace();
 
@@ -68,20 +151,30 @@ public class AlertasDAO {
         }
     }
 
+    /**
+     * Lista alertas por usuario
+     */
     public List<Alertas> listarAlertasPorUsuario(Long usuarioId) {
 
         Session session = null;
 
         try {
 
-            session = HibernateUtil.getSessionFactory().openSession();
+            session = HibernateUtil
+                    .getSessionFactory()
+                    .openSession();
 
             Query<Alertas> query = session.createQuery(
-                    "FROM Alertas WHERE usuarioId = :usuarioId",
+                    "FROM Alertas " +
+                    "WHERE usuarioId = :usuarioId " +
+                    "ORDER BY fechaCreacion DESC",
                     Alertas.class
             );
 
-            query.setParameter("usuarioId", usuarioId);
+            query.setParameter(
+                    "usuarioId",
+                    usuarioId
+            );
 
             return query.list();
 
@@ -99,13 +192,18 @@ public class AlertasDAO {
         }
     }
 
+    /**
+     * Obtiene alerta por ID
+     */
     public Alertas obtenerPorId(Long id) {
 
         Session session = null;
 
         try {
 
-            session = HibernateUtil.getSessionFactory().openSession();
+            session = HibernateUtil
+                    .getSessionFactory()
+                    .openSession();
 
             return session.get(Alertas.class, id);
 
@@ -123,21 +221,35 @@ public class AlertasDAO {
         }
     }
 
-    public void actualizarEstado(Long id, String estado) throws Exception {
+    /**
+     * Actualiza estado de alerta
+     */
+    public void actualizarEstado(
+            Long id,
+            String estado
+    ) throws Exception {
 
         Session session = null;
         Transaction tx = null;
 
         try {
 
-            session = HibernateUtil.getSessionFactory().openSession();
+            session = HibernateUtil
+                    .getSessionFactory()
+                    .openSession();
 
             tx = session.beginTransaction();
 
-            Alertas alerta = session.get(Alertas.class, id);
+            Alertas alerta = session.get(
+                    Alertas.class,
+                    id
+            );
 
             if (alerta == null) {
-                throw new RuntimeException("Alerta no encontrada");
+
+                throw new RuntimeException(
+                        "Alerta no encontrada"
+                );
             }
 
             alerta.setEstado(estado);
@@ -146,7 +258,9 @@ public class AlertasDAO {
 
             tx.commit();
 
-            System.out.println("✓ Estado actualizado");
+            System.out.println(
+                    "Estado actualizado correctamente"
+            );
 
         } catch (Exception ex) {
 
@@ -166,22 +280,31 @@ public class AlertasDAO {
         }
     }
 
+    /**
+     * Cuenta alertas pendientes
+     */
     public int contarAlertasPendientes(Long usuarioId) {
 
         Session session = null;
 
         try {
 
-            session = HibernateUtil.getSessionFactory().openSession();
+            session = HibernateUtil
+                    .getSessionFactory()
+                    .openSession();
 
             Query<Long> query = session.createQuery(
-                    "SELECT COUNT(*) FROM Alertas " +
+                    "SELECT COUNT(*) " +
+                    "FROM Alertas " +
                     "WHERE usuarioId = :usuarioId " +
                     "AND estado = 'pendiente'",
                     Long.class
             );
 
-            query.setParameter("usuarioId", usuarioId);
+            query.setParameter(
+                    "usuarioId",
+                    usuarioId
+            );
 
             Long resultado = query.getSingleResult();
 
@@ -201,13 +324,20 @@ public class AlertasDAO {
         }
     }
 
-    public List<Alertas> obtenerAlertasProximoVencimiento(int dias) {
+    /**
+     * Obtiene alertas próximas a vencer
+     */
+    public List<Alertas> obtenerAlertasProximoVencimiento(
+            int dias
+    ) {
 
         Session session = null;
 
         try {
 
-            session = HibernateUtil.getSessionFactory().openSession();
+            session = HibernateUtil
+                    .getSessionFactory()
+                    .openSession();
 
             Date fechaLimite = new Date(
                     System.currentTimeMillis() +
@@ -216,11 +346,16 @@ public class AlertasDAO {
 
             Query<Alertas> query = session.createQuery(
                     "FROM Alertas " +
-                    "WHERE fechaLimiteRespuesta <= :fechaLimite",
+                    "WHERE fechaLimiteRespuesta <= :fechaLimite " +
+                    "AND estado = 'pendiente' " +
+                    "ORDER BY fechaLimiteRespuesta ASC",
                     Alertas.class
             );
 
-            query.setParameter("fechaLimite", fechaLimite);
+            query.setParameter(
+                    "fechaLimite",
+                    fechaLimite
+            );
 
             return query.list();
 
@@ -229,6 +364,60 @@ public class AlertasDAO {
             ex.printStackTrace();
 
             return Collections.emptyList();
+
+        } finally {
+
+            if (session != null) {
+                session.close();
+            }
+        }
+    }
+
+    /**
+     * Elimina alerta por ID
+     */
+    public void eliminar(Long id) throws Exception {
+
+        Session session = null;
+        Transaction tx = null;
+
+        try {
+
+            session = HibernateUtil
+                    .getSessionFactory()
+                    .openSession();
+
+            tx = session.beginTransaction();
+
+            Alertas alerta = session.get(
+                    Alertas.class,
+                    id
+            );
+
+            if (alerta == null) {
+
+                throw new RuntimeException(
+                        "La alerta no existe"
+                );
+            }
+
+            session.remove(alerta);
+
+            tx.commit();
+
+            System.out.println(
+                    "Alerta eliminada correctamente"
+            );
+
+        } catch (Exception ex) {
+
+            if (tx != null) {
+                tx.rollback();
+            }
+
+            ex.printStackTrace();
+
+            throw ex;
 
         } finally {
 

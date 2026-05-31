@@ -16,8 +16,8 @@ public class LoginUsuario {
     @Column(name = "nombre")
     private String nombre;
 
-    @Column(name = "contraseña")
-    private String contraseña;
+    @Column(name = "contrasena")
+    private String contrasena;
 
     @Column(name = "rol")
     private String rol;
@@ -40,12 +40,12 @@ public class LoginUsuario {
         this.nombre = nombre;
     }
 
-    public String getContraseña() {
-        return contraseña;
+    public String getContrasena() {
+        return contrasena;
     }
 
-    public void setContraseña(String contraseña) {
-        this.contraseña = contraseña;
+    public void setContrasena(String contrasena) {
+        this.contrasena = contrasena;
     }
 
     public String getRol() {
