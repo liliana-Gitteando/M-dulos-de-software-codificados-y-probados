@@ -91,6 +91,33 @@ public class DocumentoDAO {
 
         return lista;
     }
+    
+    public Documento buscarPorRadicado(String radicado) {
+
+    Session session =
+            HibernateUtil.getSessionFactory().openSession();
+
+    try {
+
+        Query<Documento> q =
+                session.createQuery(
+                        "FROM Documento WHERE numeroRadicado = :radicado",
+                        Documento.class
+                );
+
+        q.setParameter("radicado", radicado);
+        return q.uniqueResult();
+
+        } catch (Exception e) {
+
+        e.printStackTrace();
+        return null;
+
+         } finally {
+
+        session.close();
+    }
+}
 
     /**
      * Actualizar 
@@ -116,7 +143,7 @@ public class DocumentoDAO {
 /**
  * Obtener consecutivo por tipo, año y mes
  */
-public int obtenerSiguienteRadicado(String tipo, int anio, int mes) {
+     public int obtenerSiguienteRadicado(String tipo, int anio, int mes) {
 
     Session session = HibernateUtil.getSessionFactory().openSession();
 

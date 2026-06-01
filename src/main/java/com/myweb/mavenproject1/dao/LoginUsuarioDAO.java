@@ -17,6 +17,8 @@ public class LoginUsuarioDAO {
         
         Session session = HibernateUtil.getSessionFactory().openSession();
         Transaction tx = session.beginTransaction();
+        
+        
         try {
             session.save(usuario);
             tx.commit();

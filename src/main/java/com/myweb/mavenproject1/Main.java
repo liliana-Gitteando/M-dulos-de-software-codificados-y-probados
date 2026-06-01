@@ -5,6 +5,7 @@ import com.myweb.mavenproject1.dao.LoginUsuarioDAO;
 import com.myweb.mavenproject1.entidades.Documento;
 import com.myweb.mavenproject1.entidades.LoginUsuario;
 
+
 import io.javalin.Javalin;
 
 public class Main {
@@ -23,48 +24,93 @@ public class Main {
         });
 
         // PRUEBA DOCUMENTOS
-        app.get("/documentos", ctx -> {
-            ctx.result("Endpoint documentos activo");
-        });
+       app.get("/documentos", ctx -> {
 
+        DocumentoDAO dao = new DocumentoDAO();
+
+        ctx.json(dao.listar());
+
+    });
+       
+       app.get("/documentos/{radicado}", ctx -> {
+
+     System.out.println("RADICADO BUSCADO: "
+            + ctx.pathParam("radicado"));
+           
+    DocumentoDAO dao = new DocumentoDAO();
+
+    Documento documento =
+            dao.buscarPorRadicado(
+                    ctx.pathParam("radicado")
+            );
+
+    if (documento != null) {
+
+        ctx.json(documento);
+
+    } else {
+
+        ctx.status(404);
+        ctx.result("Documento no encontrado");
+    }
+   });
+       
         // LOGIN
-        app.post("/prueba123", ctx -> {
+        app.post("/login", ctx -> {
 
-            try {
+        System.out.println("=================================");
+        System.out.println("ENTRO AL ENDPOINT /login");
+        System.out.println("BODY RECIBIDO: " + ctx.body());
+        System.out.println("=================================");
 
-                LoginRequest request =
-                        ctx.bodyAsClass(LoginRequest.class);
+    try {
 
-                LoginUsuarioDAO dao =
-                        new LoginUsuarioDAO();
+        LoginRequest request =
+                ctx.bodyAsClass(LoginRequest.class);
 
-                LoginUsuario usuario =
-                        dao.validarLogin(
-                                request.getNombre(),
-                                request.getContrasena()
-                        );
+        System.out.println("Usuario recibido: " + request.getNombre());
 
-                if (usuario != null) {
+        LoginUsuarioDAO dao =
+                new LoginUsuarioDAO();
 
-                    ctx.result("LOGIN CORRECTO");
+        LoginUsuario usuario =
+                dao.validarLogin(
+                        request.getNombre(),
+                        request.getContrasena()
+                );
 
-                } else {
+        if (usuario != null) {
 
-                    ctx.status(401);
-                    ctx.result("Usuario o contraseña incorrectos");
-                }
+            System.out.println("LOGIN CORRECTO");
 
-            } catch (Exception e) {
+            ctx.result("LOGIN CORRECTO");
 
-                e.printStackTrace();
-                ctx.status(500);
-                ctx.result("ERROR INTERNO");
-            }
+        } else {
 
-        });
+            System.out.println("USUARIO O CONTRASEÑA INCORRECTOS");
 
+            ctx.status(401);
+            ctx.result("Usuario o contraseña incorrectos");
+        }
+
+    } catch (Exception e) {
+
+        System.out.println("ERROR EN LOGIN");
+        e.printStackTrace();
+
+        ctx.status(500);
+        ctx.result("ERROR INTERNO");
+    }
+
+});
         // RADICAR DOCUMENTO
         app.post("/documentos", ctx -> {
+            
+            
+            System.out.println("================================");
+            System.out.println("ENTRO A RADICACION");
+            System.out.println(ctx.body());
+            System.out.println("================================");
 
             try {
 
@@ -78,7 +124,8 @@ public class Main {
 
                 ctx.status(201);
                 ctx.result("Documento radicado correctamente");
-
+                
+                
             } catch (Exception e) {
 
                 e.printStackTrace();
