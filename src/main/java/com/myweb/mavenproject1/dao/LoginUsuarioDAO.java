@@ -1,4 +1,4 @@
-package com.myweb.mavenproject1.dao;
+    package com.myweb.mavenproject1.dao;
 
 import com.myweb.mavenproject1.entidades.LoginUsuario;
 import com.myweb.mavenproject1.util.HibernateUtil;
@@ -85,4 +85,6 @@ public class LoginUsuarioDAO {
             session.close();
         }
     }
+    
+    
 }

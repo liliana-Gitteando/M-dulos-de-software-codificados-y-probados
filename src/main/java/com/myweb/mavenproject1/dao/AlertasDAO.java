@@ -421,9 +421,44 @@ public class AlertasDAO {
 
         } finally {
 
+            
             if (session != null) {
                 session.close();
             }
         }
     }
-}
+    
+        /**
+        * Lista todas las alertas
+        */
+       public List<Alertas> listar() {
+
+        Session session = null;
+
+        try {
+
+            session = HibernateUtil
+                    .getSessionFactory()
+                    .openSession();
+
+            return session.createQuery(
+                    "FROM Alertas ORDER BY fechaCreacion DESC",
+                    Alertas.class
+            ).list();
+
+        } catch (Exception ex) {
+
+            ex.printStackTrace();
+
+            return Collections.emptyList();
+
+        } finally {
+
+            if (session != null) {
+                session.close();
+
+            }
+
+        }
+    }
+ }

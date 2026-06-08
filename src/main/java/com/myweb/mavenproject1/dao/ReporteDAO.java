@@ -2,7 +2,7 @@ package com.myweb.mavenproject1.dao;
 
 import com.myweb.mavenproject1.entidades.Reporte;
 import com.myweb.mavenproject1.util.HibernateUtil;
-
+import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.Session;
@@ -76,31 +76,30 @@ public class ReporteDAO {
 
     public List<Reporte> listar() {
 
-        Session session = null;
+    Session session = null;
 
-        try {
+    try {
 
-            session = HibernateUtil.getSessionFactory().openSession();
+        session = HibernateUtil.getSessionFactory().openSession();
 
-            return session.createQuery(
-                    "FROM Reporte ORDER BY id DESC",
-                    Reporte.class
-            ).list();
+        return session.createQuery(
+                "FROM Reporte ORDER BY id DESC",
+                Reporte.class
+        ).list();
 
-        } catch (Exception e) {
+    } catch (Exception e) {
 
-            e.printStackTrace();
+        e.printStackTrace();
 
-            return null;
+        return Collections.emptyList();
 
-        } finally {
+    } finally {
 
-            if (session != null) {
-                session.close();
-            }
+        if (session != null) {
+            session.close();
         }
     }
-
+}
     // OBTENER REPORTE POR ID
     
     public Reporte obtenerPorId(int id) {

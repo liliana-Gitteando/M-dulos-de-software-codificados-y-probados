@@ -2,8 +2,11 @@ package com.myweb.mavenproject1;
 
 import com.myweb.mavenproject1.dao.DocumentoDAO;
 import com.myweb.mavenproject1.dao.LoginUsuarioDAO;
+import com.myweb.mavenproject1.dao.AlertasDAO;
+import com.myweb.mavenproject1.dao.ReporteDAO;
 import com.myweb.mavenproject1.entidades.Documento;
 import com.myweb.mavenproject1.entidades.LoginUsuario;
+import com.myweb.mavenproject1.entidades.Reporte;
 
 
 import io.javalin.Javalin;
@@ -17,6 +20,19 @@ public class Main {
         System.out.println("MAIN MODIFICADO 31 MAYO");
         }).start(7000);
         
+        app.get("/alertas", ctx -> {
+
+        AlertasDAO dao = new AlertasDAO();
+        ctx.json(dao.listar());
+        });
+        
+        app.get("/reportes", ctx -> {
+
+        ReporteDAO dao = new ReporteDAO();
+
+        ctx.json(dao.listar());
+
+        });
         
         // PRUEBA SERVIDOR
         app.get("/", ctx -> {
@@ -24,13 +40,22 @@ public class Main {
         });
 
         // PRUEBA DOCUMENTOS
+      
        app.get("/documentos", ctx -> {
 
-        DocumentoDAO dao = new DocumentoDAO();
+    try {
 
+        DocumentoDAO dao = new DocumentoDAO();
         ctx.json(dao.listar());
 
-    });
+    } catch (Exception e) {
+
+        e.printStackTrace();
+
+        ctx.status(500);
+        ctx.result("ERROR EN DOCUMENTOS: " + e.getMessage());
+    }
+});
        
        app.get("/documentos/{radicado}", ctx -> {
 
@@ -54,6 +79,8 @@ public class Main {
         ctx.result("Documento no encontrado");
     }
    });
+       
+    
        
         // LOGIN
         app.post("/login", ctx -> {
@@ -103,6 +130,43 @@ public class Main {
     }
 
 });
+        
+        app.get("/login", ctx -> {
+    ctx.result("LOGIN GET FUNCIONANDO");
+});
+        
+        app.get("/usuarios", ctx -> {
+
+    LoginUsuarioDAO dao = new LoginUsuarioDAO();
+
+    ctx.json(dao.listar());
+});
+        
+        app.post("/usuarios", ctx -> {
+
+    try {
+
+        LoginUsuario usuario =
+                ctx.bodyAsClass(LoginUsuario.class);
+
+        LoginUsuarioDAO dao =
+                new LoginUsuarioDAO();
+
+        dao.guardar(usuario);
+
+        ctx.status(201);
+        ctx.result("Usuario guardado correctamente");
+
+    } catch (Exception e) {
+
+        e.printStackTrace();
+
+        ctx.status(500);
+        ctx.result("Error al guardar usuario");
+    }
+});
+        
+        
         // RADICAR DOCUMENTO
         app.post("/documentos", ctx -> {
             
